@@ -49,7 +49,7 @@ export function DashboardHeader() {
 
         <Button
           variant="default"
-          className="flex gap-2 items-center py-2 px-2.5 rounded-lg md:px-4"
+          className="flex gap-2 items-center py-2 px-2.5 rounded-lg md:py-3 md:px-4"
         >
           <DownloadIcon className="size-4" />
           <span className="hidden text-sm lg:block">Download</span>

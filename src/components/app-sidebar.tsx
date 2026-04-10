@@ -58,7 +58,7 @@ const data = {
       items: [
         {
           title: "All",
-          url: "#",
+          url: "/products",
         },
         {
           title: "Add",
@@ -139,7 +139,7 @@ const data = {
   projects: [
     {
       name: "Dashboard",
-      url: "/dashboard",
+      url: "/",
       icon: <HomeIcon />,
     },
     {
