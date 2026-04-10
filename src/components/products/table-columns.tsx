@@ -67,18 +67,16 @@ export function getProductColumns(
         <Checkbox
           checked={
             table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() ? "indeterminate" : false)
+            (table.getIsSomePageRowsSelected() && "indeterminate")
           }
-          onChange={(isSelected) =>
-            table.toggleAllPageRowsSelected(!!isSelected)
-          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
         />
       ),
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
-          onChange={(isSelected) => row.toggleSelected(!!isSelected)}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
         />
       ),
@@ -111,6 +109,7 @@ export function getProductColumns(
     {
       accessorKey: "name",
       header: "Product",
+      accessorFn: (row) => `${row.brand} ${row.name}`,
       cell: ({ row }) => {
         const product = row.original;
         return (
@@ -133,6 +132,7 @@ export function getProductColumns(
       },
     },
     {
+      id: "brand",
       accessorKey: "brand",
       header: ({ column }) => (
         <Button
@@ -150,27 +150,40 @@ export function getProductColumns(
     {
       id: "price",
       header: "Price",
+      accessorFn: (row) => row.options.map((o) => o.price), // array for range filter
+      filterFn: "arrIncludesSome", // override below
+      meta: { filterVariant: "range" },
+      filterFn: (row, _, filterValue: [number, number]) => {
+        const [min, max] = filterValue ?? [];
+        const prices = row.original.options.map((o) => o.price);
+        const lowestPrice = Math.min(...prices);
+        if (min !== undefined && lowestPrice < min) return false;
+        if (max !== undefined && lowestPrice > max) return false;
+        return true;
+      },
       cell: ({ row }) => <PriceSummary product={row.original} />,
     },
     {
       id: "stock",
       header: "Stock",
+      accessorFn: (row) => row.options.reduce((s, o) => s + o.quantity, 0),
+      meta: { filterVariant: "range" },
+      filterFn: (row, columnId, filterValue: [number, number]) => {
+        const [min, max] = filterValue ?? [];
+        const total = row.getValue<number>(columnId);
+        if (min !== undefined && total < min) return false;
+        if (max !== undefined && total > max) return false;
+        return true;
+      },
       cell: ({ row }) => <StockSummary product={row.original} />,
     },
     {
+      id: "category",
       accessorKey: "category",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          <span>Category</span>
-          <ArrowUpDown className="ml-2 size-4" />
-        </Button>
-      ),
-      cell: ({ row }) => (
-        <span className="capitalize">{row.getValue("category")}</span>
-      ),
+      meta: {
+        filterVariant: "select",
+      },
+      header: "Category",
     },
     {
       id: "actions",

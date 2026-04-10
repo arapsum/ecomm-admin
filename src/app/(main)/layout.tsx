@@ -12,7 +12,7 @@ export default function MainLayout({
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="py-4 px-2 bg-gray-100 md:px-4 lg:px-6 dark:bg-slate-800">
-        <main className="flex-1 rounded-xl shadow-md bg-background">
+        <main className="flex-1 rounded-md shadow-md bg-background">
           <Header />
           <main className="flex-1 p-4 pt-2 pb-4">{children}</main>
         </main>
